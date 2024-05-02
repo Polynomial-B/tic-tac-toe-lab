@@ -1,16 +1,22 @@
 
-// * Reset Button
-resetButton = document.querySelector('#reset')
-
-
-// * ID Message
-idMessage = document.querySelector("#message")
 
 
 
 
 /*-------------------------------- Constants --------------------------------*/
 
+const winningCombos = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [2, 4, 7],
+    [3, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+]
+
+/*-------------------------------- Variables --------------------------------*/
 
 turn = 'O'
 winner = false
@@ -24,67 +30,97 @@ let board = [
     '', '', ''
 ]
 
+/*------------------------ Cached Element References ------------------------*/
 
-squareElement = document.querySelectorAll('.sqr');
 
+// Select Squares
+const squareElement = document.querySelectorAll('.sqr');
+// Reset Button
+const resetButton = document.querySelector('#reset')
+// ID Message
+const idMessage = document.querySelector("#message")
+
+
+/*----------------------------- Event Listeners -----------------------------*/
+
+resetButton.addEventListener('click', reset)
+
+/*----------------------------- Functions -----------------------------*/
+
+function reset() {
+    // BOARD RESET
+    board = ['', '', '', '', '', '', '', '', '']
+    // CLICK COUNT RESET
+    clickCount = 0
+    // MESSAGE
+    idMessage.innerText = ''
+    // DISPLAY RESET
+    squareElement.forEach((square) => {
+        square.innerText = ''
+    })
+    winner = false
+    tie = false
+}
 
 squareElement.forEach((square) => {
     
     square.addEventListener('click', handleClick) 
 })
 
-    
-const winningCombos = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [2, 4, 7],
-    [3, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-]
 
-// we could use 'turn' here
+
+
+
 
 const checkForWinner = () => {
-    winningCombos.forEach((winningCombo) => {
-        if ((board[winningCombo[0]]) === "") {
-            return
-        } else if ((board[winningCombo[0]] === board[winningCombo[1]]) && (board[winningCombo[0]] === board[winningCombo[2]])) {
-            winner = true
-        } else {
-            return
-        }
-        
-        updateMessage()
-        render()
-    })
-    
+    if(
+        (board[0] !== '' && board[0] === board[1] && board[0] === board[2]) ||
+        (board[3] !== '' && board[3] === board[4] && board[3] === board[5]) ||
+        (board[6] !== '' && board[6] === board[7] && board[6] === board[8]) ||
+        (board[0] !== '' && board[0] === board[3] && board[0] === board[6]) ||
+        (board[1] !== '' && board[1] === board[4] && board[1] === board[7]) ||
+        (board[2] !== '' && board[2] === board[5] && board[2] === board[8]) ||
+        (board[0] !== '' && board[0] === board[4] && board[0] === board[8]) ||
+        (board[2] !== '' && board[2] === board[4] && board[2] === board[6])
+    ) {
+        winner = true;
     }
+    render()
+}   
 
 
 
+// Level Up approach:
+// const checkForWinner = () => {
+//   winningCombos.forEach((winningCombo) => {
+//     if (
+//       board[winningCombo[0]] !== '' && 
+//       board[winningCombo[0]] === board[winningCombo[1]] &&
+//       board[winningCombo[0]] === board[winningCombo[2]]
+//     ) {
+//       winner = true;
+//     }
+//   })
+// };
 
 
 
+const checkForTie = () => {
+    if (winner) {
+      return;
+    }
+  
+    if (!board.includes('')) {
+      tie = true;
+    }
+  };
 
-/*------------------------ Cached Element References ------------------------*/
 
-// * Reset Button
-resetButton = document.querySelector('#reset')
-
-
-
-// * ID Message
-idMessage = document.querySelector("#message")
-
-/*-------------------------------- Functions --------------------------------*/
 
 
 function render() {
     updateBoard
-    updateMessage
+    updateMessage()
 }
 
 
@@ -104,20 +140,7 @@ function updateMessage() {
 }
 
 
-function reset() {
-    // BOARD RESET
-    board = ['', '', '', '', '', '', '', '', '']
-    // CLICK COUNT RESET
-    clickCount = 0
-    // MESSAGE
-    idMessage.innerText = ''
-    // DISPLAY RESET
-    squareElement.forEach((square) => {
-        square.innerText = ''
-    })
-    winner = false
-    tie = false
-}
+
 
 
 
@@ -141,7 +164,8 @@ function handleClick(event) {
         event.target.innerText = turn
     } 
 
-    checkForWinner() 
+    checkForWinner()
+    checkForTie()
     render()
 }
 
@@ -155,13 +179,5 @@ function switchPlayerTurn() {
         turn = "X"
     }
 }
-
-
-
-
-/*----------------------------- Event Listeners -----------------------------*/
-
-resetButton.addEventListener('click', reset)
-
 
 
